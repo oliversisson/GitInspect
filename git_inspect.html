@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <title>Git Inspect</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+  <body>
+    <h1>Git Inspect</h1>
+    <div id="file-contents" class="FileContents"></div>
+
+    <div id="commits" class="Commits"></div>
+    <div id="tree" class="Tree">
+      <h2>Tree</h2>
+    </div>
+
+    <script type="text/template" id="tmpl-hash">
+      <a href src="#" onclick="loadHash('<%= hash %>'); return false;">
+        <%= hash %>
+      </a>
+    </script>                               
+                                            
+    <script src="js/jquery-1.11.3.min.js"></script>
+    <script src="js/underscore.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
+

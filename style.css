@@ -1,0 +1,26 @@
+div {
+  box-sizing: border-box;
+  overflow:hidden;
+  padding: 10px;
+  word-wrap:break-word
+}
+
+.FileContents {
+  display: block;
+  height: 300px;
+}
+
+.Commits {
+  display: inline-block;
+  height: 800px;
+  vertical-align: top;
+  width: 40%;
+}
+
+.Tree {
+  display: inline-block;
+  height: 800px;
+  vertical-align: top;
+  width: 59%;
+}
+

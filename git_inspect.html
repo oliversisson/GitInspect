@@ -13,9 +13,11 @@
     </div>
 
     <script type="text/template" id="tmpl-hash">
-      <a href src="#" onclick="loadHash('<%= hash %>'); return false;">
+      <a href src="#" id="<%= hash %>" class="HashLink" onclick="return false;">
         <%= hash %>
       </a>
+      <%= name %>
+      <div class="NestedTree"></div>
     </script>                               
                                             
     <script src="js/jquery-1.11.3.min.js"></script>

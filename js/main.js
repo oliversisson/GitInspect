@@ -1,5 +1,3 @@
-var loadHash;
-
 (function() {
   var tmplHash = _.template($('#tmpl-hash').html());
 
@@ -8,11 +6,11 @@ var loadHash;
   var treeEl = $('#tree');
 
   var addLinksToHashes = function(text) {
-    var addLinkToMatchedText = function(matched, type, hash) {
-      return type + ' ' + tmplHash({hash: hash});
+    var addLinkToMatchedText = function(matched, type, hash, name) {
+      return type + ' ' + tmplHash({hash: hash, name: name});
     }
 
-    return textWithHashes = text.replace(/(blob|parent|tree) (\w*)/g,
+    return textWithHashes = text.replace(/(blob|parent|tree) (\w*)(?:(?:\t)(\w+))?/g,
         addLinkToMatchedText);
   }
 
@@ -20,26 +18,47 @@ var loadHash;
     return text.replace(/\n/g, '<br>');
   }
 
-  var cleanAndSetHtml = function(text, el) {
-    el.html(addLinksToHashes(text));
+  // Probably makes sense to do this in addLinksToHashes.
+  var stripTree = function(text) {
+    return text.
+        replace(/.......tree./g, '&#187').
+        replace(/.......blob./g, '');
   }
 
-  loadHash = function(hash) {
+  var cleanAndSetHtml = function(header, text, el, willStripTree) {
+    header = header ? '<h2>' + header + '</h2>' : '';
+    var html = header + addLinksToHashes(text);
+    el.html(willStripTree ? stripTree(html) : html);
+  }
+
+  loadHash = function(hash, containerId, nestedTreeEl) {
     var gitObject = gitObjects[hash];
 
     if(gitObject.contents.slice(1, 7) === 'commit') {
       var treeHash = gitObject.meaning.match(/tree (.*)/)[1];
       var treeMeaning = formatLinebreaks(gitObjects[treeHash].meaning);
-      cleanAndSetHtml('<h2>Tree</h2>' + treeMeaning, treeEl);
+      cleanAndSetHtml('Tree', treeMeaning, treeEl, true);
     }
-    cleanAndSetHtml('<h2>File contents</h2>' + formatLinebreaks(
-        gitObject.meaning), fileContentsEl);
+
+    if(containerId === 'tree' && gitObject.contents.slice(1, 5) === 'tree') {
+      if(nestedTreeEl.html() === '') {
+        cleanAndSetHtml(null, formatLinebreaks(gitObject.meaning),
+            nestedTreeEl, true);
+      }
+      nestedTreeEl.toggle();
+    }
+    cleanAndSetHtml('File contents', formatLinebreaks(gitObject.meaning),
+        fileContentsEl);
   };
 
-  var commits_html = '<h2>Commits</h2>';
+  var commits_html = '';
   _.each(commits, function(commit) {
     commits_html = commits_html + tmplHash({hash: commit}) + '<br>';
   });
-  cleanAndSetHtml(commits_html, commitsEl);
+  cleanAndSetHtml('Commits', commits_html, commitsEl);
+  $(document).on('click', 'a', function(e) {
+    var $target = $(e.target);
+    loadHash($target.attr('id'), $target.parent().attr('id'), $target.next() );
+  });
 })();
 
